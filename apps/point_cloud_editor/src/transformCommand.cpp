@@ -41,6 +41,7 @@
 #include <pcl/apps/point_cloud_editor/transformCommand.h>
 #include <pcl/apps/point_cloud_editor/selection.h>
 #include <pcl/apps/point_cloud_editor/common.h>
+#include <pcl/console/print.h>
 
 TransformCommand::TransformCommand(ConstSelectionPtr selection_ptr,
                                    CloudPtr cloud_ptr,
@@ -63,6 +64,7 @@ TransformCommand::TransformCommand(ConstSelectionPtr selection_ptr,
 void
 TransformCommand::execute()
 {
+  pcl::console::print_info("Running Transform\n");
   if (!cloud_ptr_)
     return;
   applyTransform(selection_ptr_);

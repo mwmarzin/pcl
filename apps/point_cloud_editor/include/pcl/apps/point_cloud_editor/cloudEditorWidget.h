@@ -47,6 +47,7 @@
 #include <pcl/apps/point_cloud_editor/common.h>
 #include <pcl/apps/point_cloud_editor/commandQueue.h>
 #include <pcl/apps/point_cloud_editor/denoiseParameterForm.h>
+#include <pcl/apps/point_cloud_editor/grabcutParameterForm.h>
 #include <pcl/apps/point_cloud_editor/statisticsDialog.h>
 #include <pcl/apps/point_cloud_editor/toolInterface.h>
 
@@ -131,6 +132,10 @@ class CloudEditorWidget : public QGLWidget
     /// @brief Denoises the current cloud.
     void
     denoise ();
+    
+    ///@brief performs the grabcut segmentation algorithm on the active selection
+    void
+    grabcut();
 
     /// @brief Undoes last change.
     void

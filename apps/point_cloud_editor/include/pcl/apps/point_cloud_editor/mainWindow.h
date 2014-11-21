@@ -195,6 +195,9 @@ class MainWindow : public QMainWindow
 
     /// action for denoising the cloud
     QAction *denoise_action_;
+    
+    ///action for running grabcut
+    QAction *grabcut_action_;
 
     /// action for showing the statistics of the editor
     QAction *show_stat_action_;

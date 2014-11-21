@@ -67,6 +67,7 @@
 #include <pcl/apps/point_cloud_editor/pasteCommand.h>
 #include <pcl/apps/point_cloud_editor/deleteCommand.h>
 #include <pcl/apps/point_cloud_editor/denoiseCommand.h>
+#include <pcl/apps/point_cloud_editor/grabcutCommand.h>
 #include <pcl/apps/point_cloud_editor/cutCommand.h>
 #include <pcl/apps/point_cloud_editor/mainWindow.h>
 
@@ -310,6 +311,18 @@ CloudEditorWidget::denoise ()
     cloud_ptr_, form.getMeanK(), form.getStdDevThresh()));
   command_queue_ptr_->execute(c);
   update();
+}
+
+void CloudEditorWidget::grabcut()
+{
+    if (!cloud_ptr_)
+        return;
+    GrabcutParameterForm form;
+    form.exec();
+    boost::shared_ptr<GrabcutCommand> c(new GrabcutCommand(selection_ptr_,
+                                                           cloud_ptr_, form.getK(), form.getLambda()));
+    command_queue_ptr_->execute(c);
+    update();
 }
 
 void

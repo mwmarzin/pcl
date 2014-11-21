@@ -1,10 +1,11 @@
 SET(SUBSUBSYS_NAME point_cloud_editor)
 SET(SUBSUBSYS_DESC "Point Cloud Editor - Simple editor for 3D point clouds")
-SET(SUBSUBSYS_DEPS common filters io apps)
+SET(SUBSUBSYS_DEPS common filters segmentation io apps)
 
 SET(MOC_INCS "include/pcl/apps/${SUBSUBSYS_NAME}/cloudEditorWidget.h"
              "include/pcl/apps/${SUBSUBSYS_NAME}/mainWindow.h"
              "include/pcl/apps/${SUBSUBSYS_NAME}/denoiseParameterForm.h"
+			 "include/pcl/apps/${SUBSUBSYS_NAME}/grabcutParameterForm.h"
              "include/pcl/apps/${SUBSUBSYS_NAME}/statisticsDialog.h"
   )
 
@@ -21,6 +22,7 @@ SET(INCS ${MOC_INCS}
          "include/pcl/apps/${SUBSUBSYS_NAME}/cutCommand.h"
          "include/pcl/apps/${SUBSUBSYS_NAME}/deleteCommand.h"
          "include/pcl/apps/${SUBSUBSYS_NAME}/denoiseCommand.h"
+		 "include/pcl/apps/${SUBSUBSYS_NAME}/grabcutCommand.h"
          "include/pcl/apps/${SUBSUBSYS_NAME}/localTypes.h"
          "include/pcl/apps/${SUBSUBSYS_NAME}/pasteCommand.h"
          "include/pcl/apps/${SUBSUBSYS_NAME}/select1DTool.h"
@@ -50,10 +52,12 @@ SET(SRCS src/main.cpp
          src/transformCommand.cpp
          src/common.cpp
          src/denoiseCommand.cpp
+		 src/grabcutCommand.cpp
          src/statistics.cpp
          src/statisticsDialog.cpp
          src/trackball.cpp
          src/denoiseParameterForm.cpp
+		 src/grabcutParameterForm.cpp
   )
 
 IF(NOT QT4_FOUND)
@@ -112,6 +116,7 @@ IF(BUILD)
                         pcl_common
                         pcl_io
                         pcl_filters
+						pcl_segmentation
 			)
 
   PCL_ADD_INCLUDES("${SUBSUBSYS_NAME}" "${SUBSYS_NAME}/${SUBSUBSYS_NAME}" ${INCS})

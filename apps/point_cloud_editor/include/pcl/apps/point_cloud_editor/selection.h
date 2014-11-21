@@ -185,6 +185,11 @@ class Selection : public Statistics
     /// selected points.
     void
     invertSelect ();
+  
+    /// @brief Get the size of the selected indicies
+    /// @details 
+    int
+    size();
 
     /// @brief Get the statistics of the selected points in string.
     std::string

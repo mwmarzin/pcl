@@ -251,6 +251,10 @@ MainWindow::createActions ()
   connect(show_stat_action_, SIGNAL(triggered()), cloud_editor_widget_,
           SLOT(showStat()));
   show_stat_action_->setCheckable(false);
+  
+  grabcut_action_ = new QAction(tr("Grabcut"), this);
+  connect(grabcut_action_, SIGNAL(triggered()), cloud_editor_widget_,
+          SLOT(grabcut()));
 }
 
 void
@@ -293,6 +297,7 @@ MainWindow::createMenus ()
   tool_menu_ = new QMenu(tr("&Algorithm"), this);
   tool_menu_ -> setAttribute(Qt::WA_DeleteOnClose);
   tool_menu_ -> addAction(denoise_action_);
+  tool_menu_ -> addAction(grabcut_action_);
 
   help_menu_ = new QMenu(tr("&Help"), this);
   help_menu_ -> setAttribute(Qt::WA_DeleteOnClose);

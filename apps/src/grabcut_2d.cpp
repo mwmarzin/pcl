@@ -1,10 +1,11 @@
-#include <pcl/point_cloud.h>
 #include <pcl/segmentation/grabcut_segmentation.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/console/print.h>
 #include <pcl/console/parse.h>
 #include <pcl/point_types.h>
 #include <pcl/PCLPointCloud2.h>
+
+#include <iostream>
 
 #ifdef GLUT_IS_A_FRAMEWORK
 #include <GLUT/glut.h>
@@ -16,6 +17,8 @@
 #include <GL/openglut.h>
 #endif
 #endif
+
+using namespace std;
 
 class GrabCutHelper : public pcl::GrabCut<pcl::PointXYZRGB>
 {
@@ -30,7 +33,7 @@ class GrabCutHelper : public pcl::GrabCut<pcl::PointXYZRGB>
   using pcl::GrabCut<pcl::PointXYZRGB>::K_;
   using pcl::GrabCut<pcl::PointXYZRGB>::GMM_component_;
   using pcl::GrabCut<pcl::PointXYZRGB>::input_;
-
+    
   public:
   typedef boost::shared_ptr<GrabCutHelper > Ptr;
   typedef boost::shared_ptr<const GrabCutHelper > ConstPtr;
@@ -79,6 +82,7 @@ class GrabCutHelper : public pcl::GrabCut<pcl::PointXYZRGB>
 void
 GrabCutHelper::setInputCloud (const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& cloud)
 {
+  pcl::console::print_info("Set Input Cloud");
   pcl::GrabCut<pcl::PointXYZRGB>::setInputCloud (cloud);
   // Reset clouds
   n_links_image_.reset (new pcl::PointCloud<float> (cloud->width, cloud->height, 0));
@@ -101,6 +105,7 @@ GrabCutHelper::setBackgroundPointsIndices (const pcl::PointIndices::ConstPtr& po
 void
 GrabCutHelper::setBackgroundPointsIndices (int x1, int y1, int x2, int y2)
 {
+  pcl::console::print_info("setBackgroundPointsIndices (x1: %d, y1: %d), (x2: %d, y2: %d) \n", x1, y1, x2, y2);
   pcl::PointIndices::Ptr point_indices (new pcl::PointIndices);
   point_indices->indices.reserve (input_->size ());
   if (x1 > x2) std::swap (x1, x2);
@@ -115,6 +120,7 @@ GrabCutHelper::setBackgroundPointsIndices (int x1, int y1, int x2, int y2)
 void
 GrabCutHelper::setTrimap(int x1, int y1, int x2, int y2, const pcl::segmentation::grabcut::TrimapValue& t)
 {
+  pcl::console::print_info("Set Trimap\n");
   using namespace pcl::segmentation::grabcut;
   if (x1 > x2) std::swap (x1, x2);
   if (y1 > y2) std::swap (y1, y2);
@@ -138,6 +144,7 @@ GrabCutHelper::setTrimap(int x1, int y1, int x2, int y2, const pcl::segmentation
 void
 GrabCutHelper::refine ()
 {
+  pcl::console::print_info("Refine\n");
 //  boost::lock_guard<boost::mutex> lock (refine_mutex);
   pcl::GrabCut<pcl::PointXYZRGB>::refine ();
   buildImages ();
@@ -147,6 +154,7 @@ GrabCutHelper::refine ()
 int
 GrabCutHelper::refineOnce ()
 {
+  pcl::console::print_info("Refine Once\n");
   //  boost::lock_guard<boost::mutex> lock (refine_once_mutex);
   int result = pcl::GrabCut<pcl::PointXYZRGB>::refineOnce ();
   buildImages ();
@@ -157,6 +165,7 @@ GrabCutHelper::refineOnce ()
 void
 GrabCutHelper::fitGMMs ()
 {
+  pcl::console::print_info("Fit GMMS \n");
 //  boost::lock_guard<boost::mutex> lock (fit_gmms_mutex);
   pcl::GrabCut<pcl::PointXYZRGB>::fitGMMs ();
   buildImages ();
@@ -166,6 +175,7 @@ GrabCutHelper::fitGMMs ()
 void
 GrabCutHelper::buildImages ()
 {
+  pcl::console::print_info("Build Images");
   using namespace pcl::segmentation::grabcut;
   memset (&n_links_image_->points[0], 0, sizeof (float) * n_links_image_->size ());
   for (int y = 0; y < static_cast<int> (image_->height); ++y)
@@ -227,6 +237,16 @@ GrabCutHelper::buildImages ()
 void
 GrabCutHelper::display (int display_type)
 {
+  
+  string display_type_str = "";
+  ostringstream convert;
+  convert << display_type;
+  display_type_str = convert.str();
+  
+  //pcl::console::print_info("Display Type: ");
+  //display_type_str += "\n";
+  //const char * log_msg = display_type_str.c_str();
+  //pcl::console::print_info(log_msg);
   switch (display_type)
   {
     case 0:
@@ -265,7 +285,7 @@ bool initialized = false;
 // 2D stuff
 int xstart, ystart, xend, yend;
 bool box = false;
-bool left = false, right = false;
+bool leftt = false, rightt = false;
 bool refining_ = false;
 uint32_t width, height;
 GrabCutHelper grabcut;
@@ -275,6 +295,7 @@ pcl::segmentation::grabcut::Image::Ptr display_image;
 void
 display ()
 {
+  pcl::console::print_info("diplay () \n");
   glClear(GL_COLOR_BUFFER_BIT);
 
   if (display_type == -1)
@@ -335,10 +356,10 @@ motion_callback (int x, int y)
 
   if (initialized)
   {
-    if (left)
+    if (leftt)
       grabcut.setTrimap (x-2,y-2,x+2,y+2,pcl::segmentation::grabcut::TrimapForeground);
 
-    if (right)
+    if (rightt)
       grabcut.setTrimap (x-2,y-2,x+2,y+2,pcl::segmentation::grabcut::TrimapForeground);
 
     glutPostRedisplay ();
@@ -348,6 +369,14 @@ motion_callback (int x, int y)
 void
 mouse_callback (int button, int state, int x, int y)
 {
+  string buttonStr = "";
+  ostringstream convert;
+  convert << button;
+  buttonStr = convert.str();
+
+  //const char * log_msg = strcat("Mouse Button Callback", buttonStr.c_str());
+  //pcl::console::print_info(log_msg);
+  //pcl::console::print_info("\n");
   y = height - y;
 
   switch (button)
@@ -355,7 +384,7 @@ mouse_callback (int button, int state, int x, int y)
     case GLUT_LEFT_BUTTON:
       if (state==GLUT_DOWN)
       {
-        left = true;
+        leftt = true;
 
         if (!initialized)
         {
@@ -366,7 +395,7 @@ mouse_callback (int button, int state, int x, int y)
 
       if (state==GLUT_UP)
       {
-        left = false;
+        leftt = false;
 
         if (initialized)
         {
@@ -388,11 +417,11 @@ mouse_callback (int button, int state, int x, int y)
     case GLUT_RIGHT_BUTTON:
       if (state==GLUT_DOWN)
       {
-        right = true;
+        rightt = true;
       }
       if (state==GLUT_UP)
       {
-        right = false;
+        rightt = false;
 
         if (initialized)
         {
@@ -462,7 +491,12 @@ keyboard_callback (unsigned char key, int, int)
 ///////////////////////////////////////////////////////////////////////////////////
 int main (int argc, char** argv)
 {
-    // Parse the command line arguments for .pcd files
+  int stuff;
+  pcl::console::print_info("Attach Debugger!\n");
+  cin >> stuff;
+  pcl::console::print_info("Running Junx!\n");
+  
+  // Parse the command line arguments for .pcd files
   std::vector<int> parsed_file_indices = pcl::console::parse_file_extension_argument (argc, argv, ".pcd");
   if (parsed_file_indices.empty ())
   {
@@ -470,13 +504,15 @@ int main (int argc, char** argv)
     pcl::console::print_info ("Ideally, need an input file, and two output PCD files, e.g., object.pcd, background.pcd\n");
     return (-1);
   }
-
+  
+  pcl::console::print_info("Parse Parameters!\n");
   std::string object_file = "object.pcd", background_file = "background.pcd";
   if (parsed_file_indices.size () >= 3)
     background_file = argv[parsed_file_indices[2]];
   if (parsed_file_indices.size () >= 2)
     object_file = argv[parsed_file_indices[1]];
 
+  pcl::console::print_info("Read File!\n");
   pcl::PCDReader reader;
   // Test the header
   pcl::PCLPointCloud2 dummy;
@@ -505,6 +541,7 @@ int main (int argc, char** argv)
       return (-1);
     }
 
+  pcl::console::print_info("If isOrganized!\n");
   if (scene->isOrganized ())
   {
     pcl::console::print_highlight ("Enabling 2D image viewer mode.\n");
@@ -516,6 +553,7 @@ int main (int argc, char** argv)
 
   display_type = -1;
 
+  pcl::console::print_info("Image?!\n");
   display_image.reset (new pcl::segmentation::grabcut::Image (scene->width, scene->height));
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr tmp (new pcl::PointCloud<pcl::PointXYZRGB> (scene->width, scene->height));
 
@@ -535,15 +573,20 @@ int main (int argc, char** argv)
       }
     }
   }
-
+  
+  pcl::console::print_info("Set Input Cloud!\n");
   grabcut.setInputCloud (tmp);
 
+  pcl::console::print_info("glutInit!\n");
   glutInit (&argc,argv);
+
+  pcl::console::print_info("glutInitDisplayMode!\n");
   glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB);
-
+    
   glutInitWindowSize (width, height);
+    
   glutInitWindowPosition (100,100);
-
+  pcl::console::print_info("Create Window!\n");
   glutCreateWindow ("GrabCut");
 
   glOrtho (0,width,0,height,-1,1);
@@ -559,6 +602,7 @@ int main (int argc, char** argv)
   glutMotionFunc (motion_callback);
   glutKeyboardFunc (keyboard_callback);
 
+  pcl::console::print_info("Main Loop!\n");
   glutMainLoop ();
 
   return (0);

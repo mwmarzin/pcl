@@ -115,6 +115,12 @@ Selection::invertSelect ()
   selected_indices_ = complement;
 }
 
+int
+Selection::size()
+{
+  return selected_indices_.size();
+}
+
 std::string
 Selection::getStat () const
 {
